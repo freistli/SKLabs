@@ -1,0 +1,5 @@
+Here is the software version number list {{$input}}
+The software version number format is Major.Minor.Patch.MinorPatch.
+Please compare all version numbers in the list from the first item to the last item, sort the list in descend.
+If the largest version is 91.123.456.7890, respond in json: {\"version\":\"91.123.456.7890\"}. If the list is empty, respond this json only: {\"version\":\"0.0.0.0\"}.
+The largest version number in the list is, I only need json string: 

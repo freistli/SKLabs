@@ -12,4 +12,7 @@ IKernel kernel = settings.BuildSKernel();
 
 await CoreSkills.DemoTextSkillAsync(kernel);
 await CoreSkills.DemoHttpSkillAsync(kernel);
-await ChainCoreAndMySkills.DemoAsync(kernel);
+await ChainCoreAndMySkills.DemoChainNativeFunctionAsync(kernel);
+await ChainCoreAndMySkills.DemoChainSemanticFunctionAsync(kernel);
+
+

@@ -14,4 +14,13 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.14.547.1-preview" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Plugins\SemanticPlugins\FindLatestVersion\config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Plugins\SemanticPlugins\FindLatestVersion\skprompt.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
