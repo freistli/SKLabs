@@ -18,7 +18,7 @@ namespace SKDemos.plugins
         public string GetAvailableVersions(string input, SKContext context)
         {
             List<string> result = new List<string>();
-            string pattern = string.Format(@"<p>(.*?)<\/p>[^<(.?)*]*<\/td>[^<(.?)*]*<td>[^<(.?)*]*<p>{0}<\/p>", Regex.Escape(context["devicename"].Replace("\\-","[-\u2013]")));
+            string pattern = string.Format(@"<p>[^\d]*([0-9]*[\.][0-9]*[\.][0-9]*[\.][0-9]*)<\/p>[^<(.?)*]*<\/td>[^<(.?)*]*<td>[^<(.?)*]*<p>{0}<\/p>", Regex.Escape(context["devicename"].Replace("\\-","[-\u2013]")));
             foreach (Match match in Regex.Matches(input, pattern, RegexOptions.IgnoreCase))
             {
                 Console.WriteLine("{0}", match.Groups[1].Value);
