@@ -11,7 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.14.547.1-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Skills.Document" Version="0.14.547.1-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Skills.Web" Version="0.14.547.1-preview" />
   </ItemGroup>
 
   <ItemGroup>

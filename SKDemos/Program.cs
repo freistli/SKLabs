@@ -10,9 +10,17 @@ IKernel kernel = settings.BuildSKernel();
 
 //await ChainRawPrompts.DemoAsync(kernel);
 
-await CoreSkills.DemoTextSkillAsync(kernel);
-await CoreSkills.DemoHttpSkillAsync(kernel);
-await ChainCoreAndMySkills.DemoChainNativeFunctionAsync(kernel);
-await ChainCoreAndMySkills.DemoChainSemanticFunctionAsync(kernel);
+//await CoreSkills.DemoTextSkillAsync(kernel);
+//await CoreSkills.DemoHttpSkillAsync(kernel);
+//await ChainCoreAndMySkills.DemoChainNativeFunctionAsync(kernel);
+//await ChainCoreAndMySkills.DemoChainSemanticFunctionAsync(kernel);
+
+await Planner.DemoPlannerAsync(kernel);
+
+//await SKConnectors.DemoConnectorsAsync(kernel);
+
+//await WebSearchUrl.RunAsync();
+
+await FunctionSummary.RunAsync(kernel);
 
 

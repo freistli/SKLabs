@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SKDemos
 {
+    //A demo of using the core skills - TextSkill and HttpSkill
     class CoreSkills
     {
         public static async Task DemoTextSkillAsync(IKernel kernel)

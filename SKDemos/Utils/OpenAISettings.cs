@@ -33,7 +33,7 @@ namespace SKDemos
         {
             AzureOpenAIInit();
             
-            var kernel = Kernel.Builder.Build();
+            var kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).Build();
 
             if (IsValid())
             {
