@@ -10,7 +10,7 @@ namespace SKDemos
 
             One line TLDR with the fewest words.";
 
-            var summarize = kernel.CreateSemanticFunction(prompt);
+            var summarize = kernel.CreateSemanticFunction(prompt,"inlineSummarize");
 
             string text1 = @"
             1st Law of Thermodynamics - Energy cannot be created or destroyed.
@@ -18,6 +18,8 @@ namespace SKDemos
             3rd Law of Thermodynamics - A perfect crystal at zero Kelvin has zero entropy.";
 
             Console.WriteLine(await summarize.InvokeAsync(text1)); 
+
+            Console.WriteLine(await kernel.Func("_GLOBAL_FUNCTIONS_","inlineSummarize").InvokeAsync(text1)); 
 
             // Output:
             //   Energy conserved, entropy increases, zero entropy at 0K.

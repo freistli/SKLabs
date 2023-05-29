@@ -13,12 +13,17 @@
             "args": [],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
-            "stopAtEntry": false
+            //"console": "integratedTerminal",
+            "stopAtEntry": false,
+            "logging": {
+                "moduleLoad": false
+            },
+            
         },
         {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
-        }
+        }        
     ]
 }
