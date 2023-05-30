@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
 using Microsoft.SemanticKernel.Reliability;
 
 namespace SKDemos
@@ -10,7 +11,13 @@ namespace SKDemos
         public string OpenAIEndpoint { get; set; }
         public string OpenAIDeploymentName { get; set; }
 
+        public string ACS_API_KEY { get; set; }
+        public string ACS_API_ENDPOINT { get; set; }
+
         public bool IsAzure { get; set;}
+
+        public bool UseACS { get; set;}
+        public IConfigurationRoot Config { get; private set; }
 
         public bool IsValid()
         {
@@ -23,11 +30,20 @@ namespace SKDemos
 
         }
 
+        public void ACSInit()
+        {
+            var secretProvider = Config.Providers.First();
+            secretProvider.TryGet("ACS:Key", out var acsKey);
+            ACS_API_KEY = acsKey;
+            secretProvider.TryGet("ACS:Base", out var acsEndpoint);
+            ACS_API_ENDPOINT = acsEndpoint;
+        }
+
         public void AzureOpenAIInit()
         {
-            var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+            Config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
             
-            var secretProvider = config.Providers.First();
+            var secretProvider = Config.Providers.First();
             secretProvider.TryGet("AzureOpenAI:Key", out var openAIKey);
             OpenAIKey = openAIKey;
             secretProvider.TryGet("AzureOpenAI:Base", out var openAIEndpoint);
@@ -41,13 +57,14 @@ namespace SKDemos
                 OpenAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAI:Base");
                 OpenAIDeploymentName = Environment.GetEnvironmentVariable("AzureOpenAI:Deployment");
             }
+ 
         }
 
         public void OpenAIInit()
         {
-            var config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
+            Config = new ConfigurationBuilder().AddUserSecrets<Program>().Build();
             
-            var secretProvider = config.Providers.First();
+            var secretProvider = Config.Providers.First();
             secretProvider.TryGet("OpenAI:Key", out var openAIKey);
             OpenAIKey = openAIKey;             
 
@@ -55,6 +72,7 @@ namespace SKDemos
             {
                 OpenAIKey = Environment.GetEnvironmentVariable("OpenAI:Key");
             }
+ 
         }
 
         public void DisplayHttpRetryConfig(IKernel kernel)
@@ -74,8 +92,16 @@ namespace SKDemos
                 OpenAIInit();
 
            var retryConfig = new HttpRetryConfig() { MaxRetryCount = 5, UseExponentialBackoff = true };
-                       
-           var kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).Build();
+
+           IKernel kernel = null;
+
+           if(UseACS)
+           {
+                ACSInit();
+                kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY)).Build();
+           }
+           else
+               kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).Build();
 
            DisplayHttpRetryConfig(kernel);
 

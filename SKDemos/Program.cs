@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 OpenAISettings settings = new OpenAISettings();
 settings.IsAzure = false;
+settings.UseACS = false;
 IKernel kernel = settings.BuildSKernel();
 
 //await RawSummparyPrompt.DemoAsync(kernel);
@@ -16,9 +17,16 @@ IKernel kernel = settings.BuildSKernel();
 //await Planner.DemoPlannerAsync(kernel);
 //await SKConnectors.DemoConnectorsAsync(kernel);
 //await WebSearchUrl.RunAsync();
-await ConversationSummary.RunAsync(kernel);
+//await ConversationSummary.RunAsync(kernel);
 
+ //await SemanticMemory.RunACSDocIndexQueryAsync(kernel,"How to apply vacation leave?");
+
+await SemanticMemory.RunEmbeddingySearchAsync(settings);
 //Console.ReadKey();
+
+//var customSearch = new AzureCognitiveSearchMemoryExtend(settings.ACS_API_ENDPOINT, settings.ACS_API_KEY);
+//customSearch.Base_GetSearchClient("docindex");
+
 
 //await FunctionSummary.RunAsync(kernel);
 
