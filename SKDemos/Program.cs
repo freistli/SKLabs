@@ -14,19 +14,22 @@ IKernel kernel = settings.BuildSKernel();
 //await CoreSkills.DemoHttpSkillAsync(kernel);
 //await ChainCoreAndMySkills.DemoChainNativeFunctionAsync(kernel);
 //await ChainCoreAndMySkills.DemoChainSemanticFunctionAsync(kernel);
+//await ChainCoreAndMySkills.DemoSummarizeURL(kernel,"");
 //await Planner.DemoPlannerAsync(kernel);
 //await SKConnectors.DemoConnectorsAsync(kernel);
 //await WebSearchUrl.RunAsync();
 //await ConversationSummary.RunAsync(kernel);
 
- //await SemanticMemory.RunACSDocIndexQueryAsync(kernel,"How to apply vacation leave?");
+//await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"How to apply vacation leave?");
 
-await SemanticMemory.RunEmbeddingySearchAsync(settings);
+await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
+
 //Console.ReadKey();
 
 //var customSearch = new AzureCognitiveSearchMemoryExtend(settings.ACS_API_ENDPOINT, settings.ACS_API_KEY);
 //customSearch.Base_GetSearchClient("docindex");
 
+//await ChatGPT.RunAsync(kernel);
 
 //await FunctionSummary.RunAsync(kernel);
 

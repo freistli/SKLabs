@@ -38,6 +38,19 @@ namespace SKDemos
             Console.WriteLine(output);
         }
 
+        public static async Task DemoSummarizeURL(IKernel kernel, string uri)
+        {
+            var httpSkill = kernel.ImportSkill(new HttpSkill());
+            var SemanticPlugins = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPlugins");
+            var skContext = new ContextVariables();
+            skContext.Set("input", uri);
+
+            var output = await kernel.RunAsync(skContext, httpSkill["GetAsync"], SemanticPlugins["SummarizeContent"]);
+
+            Console.WriteLine(output);
+
+        }
+
 
     }
 }

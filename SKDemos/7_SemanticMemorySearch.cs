@@ -8,6 +8,9 @@ using Microsoft.SemanticKernel.Connectors.AI.OpenAI;
 
 using SKDemos;
 using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextEmbedding;
+using Microsoft.SemanticKernel.CoreSkills;
+using Microsoft.SemanticKernel.Orchestration;
+using Microsoft.SemanticKernel.Reliability;
 
 /* The files contains two examples about SK Semantic Memory.
  *
@@ -23,7 +26,7 @@ public static class SemanticMemory
     //when use ACS< this is the index name
     private const string MemoryCollectionName = "SKGithubSample";
 
-    public static async Task RunACSDocIndexQueryAsync(IKernel kernel, string query)
+    public static async Task DemoACSDocIndexQueryAsync(IKernel kernel, string query)
     {
         Console.WriteLine("==============================================================");
         Console.WriteLine("======== Semantic Memory using Azure Cognitive Search ========");
@@ -32,9 +35,13 @@ public static class SemanticMemory
         //The docindex has been built by other code, here we just query it
         await RunDocIndexAsync(kernel, query);  
 
+
+        //Change AzureCognitiveSearchMemoryExtend ==> AzureCognitiveSearchMemory to use the default ACS connector
+        //await RunSampleDataUpdateQueryAsync(kernel);
+
     }
 
-    public static async Task RunACSQueryAsync(IKernel kernel)
+    public static async Task DemoACSSampleDataQueryAsync(IKernel kernel)
     {
         Console.WriteLine("==============================================================");
         Console.WriteLine("======== Semantic Memory using Azure Cognitive Search ========");
@@ -45,22 +52,49 @@ public static class SemanticMemory
 
     }
 
-    public static async Task RunEmbeddingySearchAsync(OpenAISettings settings)
+    public static async Task DemoEmbeddingyMemorySearchAsync(OpenAISettings settings)
     {
-         var embeddingGenerator = new OpenAITextEmbeddingGeneration("text-embedding-ada-002", settings.OpenAIKey);
+        var embeddingGenerator = new OpenAITextEmbeddingGeneration("text-embedding-ada-002", settings.OpenAIKey);
 
-            var kernel = Kernel.Builder
-                .WithLogger(ConsoleLogger.Log)
-                .WithMemoryStorageAndTextEmbeddingGeneration(new VolatileMemoryStore(), embeddingGenerator)
-                .Build();
- 
-            await RunSampleDataUpdateQueryAsync(kernel);
+        var kernel = Kernel.Builder
+            .WithLogger(ConsoleLogger.Log)
+            .WithOpenAITextCompletionService("text-davinci-003", settings.OpenAIKey)
+            .WithMemoryStorageAndTextEmbeddingGeneration(new VolatileMemoryStore(), embeddingGenerator)
+            .Build();
+        
+        var retryConfig = new HttpRetryConfig() { MaxRetryCount = 8 };
+
+        kernel.Config.SetDefaultHttpRetryConfig(retryConfig);        
+
+        await RunWebContentUpdateQueryAsync(kernel);
     }
+
     public static async Task RunSampleDataUpdateQueryAsync(IKernel kernel)
     {
         await StoreMemoryAsync(kernel);
 
         await SearchMemoryAsync(kernel, MemoryCollectionName, "give me a summary");
+
+     }
+
+      public static async Task DemoWebContentUpdateQueryAsync(IKernel kernel)
+    {
+        Console.WriteLine("\nAdding Web Content descriptions to the semantic memory.");
+       var httpSkill = kernel.ImportSkill(new HttpSkill()); 
+       var skContext = new ContextVariables();
+       skContext.Set("input", "https://raw.githubusercontent.com/microsoft/semantic-kernel/main/README.md");
+
+       var output = await kernel.RunAsync(skContext, httpSkill["GetAsync"]);
+
+        await ChunkToMemory.RunAsync(kernel, output.Result, "rootbotReadMe");
+        kernel.ImportSkill(new TextMemorySkill(), nameof(TextMemorySkill));
+        var memoryQuerySkill = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPlugins");
+
+        skContext.Set("input", "what's this file talking about?");
+        skContext.Set(TextMemorySkill.CollectionParam, "rootbotReadMe");
+        var result = await kernel.RunAsync(skContext, memoryQuerySkill["MemoryQuery"]);
+
+        Console.WriteLine(result);
 
      }
 
@@ -89,7 +123,7 @@ public static class SemanticMemory
     private static async Task SearchMemoryAsync(IKernel kernel, string index, string query)
     {
         Console.WriteLine("\nQuery: " + query + "\n");
-        
+
         var memories = kernel.Memory.SearchAsync(index, query, limit: 2, minRelevanceScore: 0.5);
 
         int i = 0;

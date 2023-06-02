@@ -108,13 +108,23 @@ namespace SKDemos
             if (IsValid())
             {
                 if(IsAzure)
-                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig).AddAzureTextCompletionService(
+                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig)
+                    .AddAzureTextCompletionService(
                     OpenAIDeploymentName,
+                    OpenAIEndpoint,
+                    OpenAIKey)
+                    .AddAzureChatCompletionService("chatgpt",
+                    OpenAIEndpoint,
+                    OpenAIKey)
+                    .AddAzureTextEmbeddingGenerationService("text-embedding-ada-002",
                     OpenAIEndpoint,
                     OpenAIKey);
                 else
-                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig).AddOpenAITextCompletionService("text-davinci-003",
-                    OpenAIKey);
+                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig)
+                    .AddOpenAITextCompletionService("text-davinci-003",
+                    OpenAIKey)
+                    .AddOpenAIChatCompletionService("gpt-3.5-turbo",OpenAIKey)
+                    .AddOpenAITextEmbeddingGenerationService("text-embedding-ada-002",OpenAIKey);
                 
                 DisplayHttpRetryConfig(kernel);
             }
