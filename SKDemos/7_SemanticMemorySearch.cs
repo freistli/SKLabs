@@ -77,7 +77,7 @@ public static class SemanticMemory
 
      }
 
-      public static async Task DemoWebContentUpdateQueryAsync(IKernel kernel)
+      public static async Task RunWebContentUpdateQueryAsync(IKernel kernel)
     {
         Console.WriteLine("\nAdding Web Content descriptions to the semantic memory.");
        var httpSkill = kernel.ImportSkill(new HttpSkill()); 

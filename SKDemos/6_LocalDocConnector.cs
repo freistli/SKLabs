@@ -21,11 +21,26 @@ namespace SKDemos
             DocumentSkill documentSkill = new(new WordDocumentConnector(), new LocalFileSystemConnector());
             var skill = kernel.ImportSkill(documentSkill, nameof(DocumentSkill));
 
+            var chunkToMemorySkill = kernel.ImportSkill(new ChunkToMemorySkill(), nameof(ChunkToMemorySkill));
+
+            var textMemorySkill = kernel.ImportSkill(new TextMemorySkill(), nameof(TextMemorySkill));
+
             var prompt = @"{{$input}}
             One line TLDR with the fewest words.";
             var summarize = kernel.CreateSemanticFunction(prompt);
 
-            var result = await kernel.RunAsync( "c:\\testtemp\\data\\info.docx",skill["ReadTextAsync"],summarize);
+            var skContext = new ContextVariables();
+            skContext.Set("input", "c:\\testtemp\\data\\info.docx");
+            skContext.Set(TextMemorySkill.CollectionParam, "localworddoc");
+            skContext.Set("question", "give me a summary of the content");
+
+            var result = await kernel.RunAsync( skContext,
+            skill["ReadTextAsync"],
+            chunkToMemorySkill["ChunkToMemoryAsync"],
+            textMemorySkill["Recall"],
+            summarize
+            );
+
             Console.WriteLine(result);
         }
     }

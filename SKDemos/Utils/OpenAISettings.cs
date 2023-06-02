@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
+using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Reliability;
 
 namespace SKDemos
@@ -16,7 +17,9 @@ namespace SKDemos
 
         public bool IsAzure { get; set;}
 
-        public bool UseACS { get; set;}
+        public bool UseACSMemoryStore { get; set;}
+
+        public bool UseMemoryStore { get; set;}
         public IConfigurationRoot Config { get; private set; }
 
         public bool IsValid()
@@ -72,7 +75,6 @@ namespace SKDemos
             {
                 OpenAIKey = Environment.GetEnvironmentVariable("OpenAI:Key");
             }
- 
         }
 
         public void DisplayHttpRetryConfig(IKernel kernel)
@@ -94,38 +96,42 @@ namespace SKDemos
            var retryConfig = new HttpRetryConfig() { MaxRetryCount = 5, UseExponentialBackoff = true };
 
            IKernel kernel = null;
+           KernelBuilder builder = null;
+
+           builder = Kernel.Builder.WithLogger(ConsoleLogger.Log);
 
            if(UseACS)
            {
                 ACSInit();
-                kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY)).Build();
+                builder.WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY));
            }
-           else
-               kernel = Kernel.Builder.WithLogger(ConsoleLogger.Log).Build();
 
-           DisplayHttpRetryConfig(kernel);
+           if(UseMemoryStore)
+            {
+                builder.WithMemoryStorage(new VolatileMemoryStore());
+            }
 
             if (IsValid())
             {
                 if(IsAzure)
-                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig)
-                    .AddAzureTextCompletionService(
+                   builder.WithAzureTextCompletionService(
                     OpenAIDeploymentName,
                     OpenAIEndpoint,
                     OpenAIKey)
-                    .AddAzureChatCompletionService("chatgpt",
+                    .WithAzureChatCompletionService("chatgpt",
                     OpenAIEndpoint,
                     OpenAIKey)
-                    .AddAzureTextEmbeddingGenerationService("text-embedding-ada-002",
+                    .WithAzureTextEmbeddingGenerationService("text-embedding-ada-002",
                     OpenAIEndpoint,
                     OpenAIKey);
                 else
-                    kernel.Config.SetDefaultHttpRetryConfig(retryConfig)
-                    .AddOpenAITextCompletionService("text-davinci-003",
+                    builder.WithOpenAITextCompletionService("text-davinci-003",
                     OpenAIKey)
-                    .AddOpenAIChatCompletionService("gpt-3.5-turbo",OpenAIKey)
-                    .AddOpenAITextEmbeddingGenerationService("text-embedding-ada-002",OpenAIKey);
+                    .WithOpenAIChatCompletionService("gpt-3.5-turbo",OpenAIKey)
+                    .WithOpenAITextEmbeddingGenerationService("text-embedding-ada-002",OpenAIKey);
                 
+                kernel = builder.Build();
+                kernel.Config.SetDefaultHttpRetryConfig(retryConfig);
                 DisplayHttpRetryConfig(kernel);
             }
             else
@@ -133,7 +139,7 @@ namespace SKDemos
                 Console.WriteLine("OpenAI settings are not valid.");
             }
 
-            return kernel;
+           return kernel;
         }
 
     }
