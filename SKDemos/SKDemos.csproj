@@ -17,6 +17,7 @@
     <PackageReference Include="Microsoft.SemanticKernel.Abstractions" Version="0.15.230531.5-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.AI.OpenAI" Version="0.15.230531.5-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.15.230531.5-preview" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.Qdrant" Version="0.15.230531.5-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Skills.Document" Version="0.15.230531.5-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Skills.Web" Version="0.15.230531.5-preview" />
   </ItemGroup>

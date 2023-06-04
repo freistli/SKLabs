@@ -58,7 +58,46 @@ public class ChunkToMemorySkill
                     $"{context["collection"]}",
                     text: $"{content}",
                     description: $"File:{context["collection"]}",
-                    id: $"{context["collection"]}");
+                    id: $"{context["collection"]}_0");
+            }
+
+            context["input"] = context["question"];
+        }
+    }
+
+    [SKFunction("Chunk content and emebedding to Memory Store ")]
+    [SKFunctionInput(Description = "Content String")]
+    [SKFunctionContextParameter(Name = "collection", Description = "Memory Collection Name")]
+    [SKFunctionContextParameter(Name = "question", Description = "The question to be answered by memory skill recall")]
+    public static async Task ChunkToQDrantAsync(string content, SKContext context)
+    {
+        if (content != null && content.Length > 0)
+        {
+            if (content.Length > MaxFileSize)
+            {
+                List<string> lines;
+                List<string> paragraphs;
+
+                lines = TextChunker.SplitMarkDownLines(content, MaxLineTokens);
+                paragraphs = TextChunker.SplitMarkdownParagraphs(lines, MaxParagraphTokens);            
+
+                for (int i = 0; i < paragraphs.Count; i++)
+                {
+                    await context.Memory.SaveInformationAsync(
+                        $"{context["collection"]}",
+                        text: $"{paragraphs[i]}",
+                        description: $"File:{context["collection"]}",
+                        id: Guid.NewGuid().ToString());
+                }
+            }
+            else
+            {
+                var id1 = Guid.NewGuid().ToString();
+                await context.Memory.SaveInformationAsync(
+                    $"{context["collection"]}",
+                    text: $"{content}",
+                    description: $"File:{context["collection"]}",
+                    id: id1);
             }
 
             context["input"] = context["question"];

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch;
+using Microsoft.SemanticKernel.Connectors.Memory.Qdrant;
 using Microsoft.SemanticKernel.Memory;
 using Microsoft.SemanticKernel.Reliability;
 
@@ -20,6 +21,8 @@ namespace SKDemos
         public bool UseACSMemoryStore { get; set;}
 
         public bool UseMemoryStore { get; set;}
+
+        public bool UseQDrant { get; set;}
         public IConfigurationRoot Config { get; private set; }
 
         public bool IsValid()
@@ -100,7 +103,7 @@ namespace SKDemos
 
            builder = Kernel.Builder.WithLogger(ConsoleLogger.Log);
 
-           if(UseACS)
+           if(UseACSMemoryStore)
            {
                 ACSInit();
                 builder.WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY));
@@ -109,6 +112,13 @@ namespace SKDemos
            if(UseMemoryStore)
             {
                 builder.WithMemoryStorage(new VolatileMemoryStore());
+            }
+
+            if (UseQDrant)
+            {
+                QdrantMemoryStore memoryStore = new("http://localhost", 6333, vectorSize: 1536, ConsoleLogger.Log);
+                builder.WithMemoryStorage(memoryStore);
+
             }
 
             if (IsValid())

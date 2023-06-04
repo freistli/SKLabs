@@ -36,7 +36,8 @@ namespace SKDemos
 
             var result = await kernel.RunAsync( skContext,
             skill["ReadTextAsync"],
-            chunkToMemorySkill["ChunkToMemoryAsync"],
+            //chunkToMemorySkill["ChunkToMemoryAsync"],
+            chunkToMemorySkill["ChunkToQDrantAsync"],
             textMemorySkill["Recall"],
             summarize
             );

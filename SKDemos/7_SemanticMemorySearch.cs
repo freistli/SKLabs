@@ -11,6 +11,8 @@ using Microsoft.SemanticKernel.Connectors.AI.OpenAI.TextEmbedding;
 using Microsoft.SemanticKernel.CoreSkills;
 using Microsoft.SemanticKernel.Orchestration;
 using Microsoft.SemanticKernel.Reliability;
+using Microsoft.SemanticKernel.Connectors.AI.OpenAI.ChatCompletion;
+using Microsoft.SemanticKernel.AI.ChatCompletion;
 
 /* The files contains two examples about SK Semantic Memory.
  *
@@ -100,26 +102,120 @@ public static class SemanticMemory
 
      public static async Task RunDocIndexAsync(IKernel kernel, string query)
     {
-        await SearchDocIndexMemoryAsync(kernel, "docindex", query);
+        await SearchDocIndexMemoryAsync(kernel, "knowledge", query);
      }
 
-    private static async Task SearchDocIndexMemoryAsync(IKernel kernel, string index, string query)
+
+    private static Task MessageOutputAsync(ChatHistory chatHistory)
     {
+        var message = chatHistory.Messages.Last();
+
+        Console.WriteLine($"{message.AuthorRole}: \r\n{message.Content}");
+        Console.WriteLine("------------------------");
+
+        return Task.CompletedTask;
+    }
+    private static async Task SearchDocIndexMemoryInConversationAsync(IKernel kernel, string index, string query)
+    {
+
+        if (string.IsNullOrEmpty(query))
+
+        {
+            Console.WriteLine("\nInput your query: \n");
+
+            query = Console.ReadLine();
+        }
+
         Console.WriteLine("\nQuery: " + query + "\n");
 
         var memories = ((AzureCognitiveSearchMemoryExtend)kernel.Memory).SearchDocIndexAsync(index, query, limit: 2, minRelevanceScore: 0.5);
 
         int i = 0;
+        
+        IChatCompletion chatGPT = kernel.GetService<IChatCompletion>();
+
+        var chatHistory = (OpenAIChatHistory)chatGPT.CreateNewChat("You are a librarian, expert about books");
+
+        var context = "";
+
         await foreach (MemoryQueryResult memory in memories)
         {
             Console.WriteLine($"Result {++i}:");
             Console.WriteLine("  Page:     : " + memory.Metadata.Description);
             Console.WriteLine("  Content    : " + memory.Metadata.Text);
             Console.WriteLine();
-        }
+            context += memory.Metadata.Text + "\r\n";
+        }        
 
-        Console.WriteLine("----------------------");
+        chatHistory.AddUserMessage($"{context} ====================================r\n" 
+                + "Please answer the following question based on above information: \r\n"
+                + query);
+                await MessageOutputAsync(chatHistory);
+
+        while(true)
+        {               
+        
+                string reply = await chatGPT.GenerateMessageAsync(chatHistory);
+                chatHistory.AddAssistantMessage(reply);
+                await MessageOutputAsync(chatHistory);
+                Console.WriteLine("------------------------");
+
+                query = Console.ReadLine();
+                chatHistory.AddUserMessage(query);
+                await MessageOutputAsync(chatHistory);
+                Console.WriteLine("------------------------");
+        }
     }
+
+    private static async Task SearchDocIndexMemoryAsync(IKernel kernel, string index, string query)
+    {
+
+        while(true)
+        {               
+
+                if (string.IsNullOrEmpty(query))
+
+                {
+                    Console.WriteLine("\nInput your query: \n");
+
+                    query = Console.ReadLine();
+                }
+
+                Console.WriteLine("\nQuery: " + query + "\n");
+
+                var memories = ((AzureCognitiveSearchMemoryExtend)kernel.Memory).SearchDocIndexAsync(index, query, limit: 2, minRelevanceScore: 0.5);
+
+                int i = 0;
+                
+                IChatCompletion chatGPT = kernel.GetService<IChatCompletion>();
+
+                var chatHistory = (OpenAIChatHistory)chatGPT.CreateNewChat("You are a librarian, expert about books");
+
+                var context = "";
+
+                await foreach (MemoryQueryResult memory in memories)
+                {
+                    Console.WriteLine($"Result {++i}:");
+                    Console.WriteLine("  Page:     : " + memory.Metadata.Description);
+                    Console.WriteLine("  Content    : " + memory.Metadata.Text);
+                    Console.WriteLine();
+                    context += memory.Metadata.Text + "\r\n";
+                }        
+
+                chatHistory.AddUserMessage($"{context} ====================================r\n" 
+                        + "Please answer the following question based on above information: \r\n"
+                        + query);
+                        await MessageOutputAsync(chatHistory);
+        
+                string reply = await chatGPT.GenerateMessageAsync(chatHistory);
+                chatHistory.AddAssistantMessage(reply);
+                await MessageOutputAsync(chatHistory);
+                Console.WriteLine("------------------------");
+
+                query = Console.ReadLine();
+        }
+    }
+
     private static async Task SearchMemoryAsync(IKernel kernel, string index, string query)
     {
         Console.WriteLine("\nQuery: " + query + "\n");

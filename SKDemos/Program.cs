@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 
 OpenAISettings settings = new OpenAISettings();
 settings.IsAzure = false;
-settings.UseACSMemoryStore = false;
-settings.UseMemoryStore = true;
+settings.UseACSMemoryStore = true;
+settings.UseMemoryStore = false;
+settings.UseQDrant = false;
 IKernel kernel = settings.BuildSKernel();
 
 //await RawSummparyPrompt.DemoAsync(kernel);
@@ -19,12 +20,14 @@ IKernel kernel = settings.BuildSKernel();
 //await Planner.DemoPlannerAsync(kernel);
 
 //6
-await SKConnectors.DemoConnectorsAsync(kernel);
+//require UseMemoryStore as true or UseQDrant as true
+
+//await SKConnectors.DemoConnectorsAsync(kernel);
 
 //await WebSearchUrl.RunAsync();
 //await ConversationSummary.RunAsync(kernel);
 
-//await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"How to apply vacation leave?");
+await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"");
 
 //await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
 
