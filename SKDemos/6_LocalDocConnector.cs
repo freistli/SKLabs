@@ -16,7 +16,7 @@ namespace SKDemos
     
     public class SKConnectors
     {
-        public static async Task DemoConnectorsAsync(IKernel kernel)
+        public static async Task DemoConnectorsAsync(IKernel kernel, string chunkFounctionName = "ChunkToMemoryAsync")
         {
             DocumentSkill documentSkill = new(new WordDocumentConnector(), new LocalFileSystemConnector());
             var skill = kernel.ImportSkill(documentSkill, nameof(DocumentSkill));
@@ -32,14 +32,27 @@ namespace SKDemos
             var skContext = new ContextVariables();
             skContext.Set("input", "c:\\testtemp\\data\\info.docx");
             skContext.Set(TextMemorySkill.CollectionParam, "localworddoc");
-            skContext.Set("question", "give me a summary of the content");
+            skContext.Set("question", "give me a summary of the content");            
+/*
+            var result = await kernel.RunAsync( skContext,
+            skill["ReadTextAsync"],
+            chunkToMemorySkill[chunkFounctionName],
+            textMemorySkill["Recall"],
+            summarize
+            );
+
+            Console.WriteLine(result);
+*/
+            skContext.Set("input", "c:\\testtemp\\data\\info.docx");
+            skContext.Set("question", "what's the first program that the author wrote");
+
+            prompt = @"Based on the information {{$input}}, answer this question: {{$question}}";
+            var answer = kernel.CreateSemanticFunction(prompt);
 
             var result = await kernel.RunAsync( skContext,
             skill["ReadTextAsync"],
-            //chunkToMemorySkill["ChunkToMemoryAsync"],
-            chunkToMemorySkill["ChunkToQDrantAsync"],
             textMemorySkill["Recall"],
-            summarize
+            answer
             );
 
             Console.WriteLine(result);

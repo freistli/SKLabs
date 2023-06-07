@@ -44,6 +44,7 @@ namespace SKDemos
 
                     Console.WriteLine($"Step {step} - Results so far:");
                     var s = plan.State.ToString();
+                    skContext.Set("input", s);
                     Console.WriteLine((s.Length < 100) ? s : s.Substring(0, 100)+"...");
                 }
             }
@@ -63,7 +64,7 @@ namespace SKDemos
             Console.WriteLine("======== Sequential Planner - Check Device Update Version ========");
 
             var deviceVersionSkill = kernel.ImportSkill(new DeviceVersionSkill(), "DeviceVersionSkill");
-            var SemanticPlugins = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPlugins");
+            var SemanticPlugins = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPluginsForPlanner");
             var httpSkill = kernel.ImportSkill(new HttpSkill(),"HttpSkill");
 
             var skContext = new ContextVariables();
@@ -74,8 +75,8 @@ namespace SKDemos
             var planner = new SequentialPlanner(kernel);
 
             var plan = await planner.CreatePlanAsync("Read the web content from input, "+
-                                                    "extract all device versions based on the devicename varaible, and then return the "+
-                                                    "largest version number");
+                                                    "extract all device versions list based on devicename, "+
+                                                    "and then return the largest version number from the list.");
 
             Console.WriteLine("Original plan:");
             foreach (var step in plan.Steps)
@@ -83,7 +84,8 @@ namespace SKDemos
                 Console.WriteLine(step.SkillName);
             }
 
-            await Planner.ExecutePlanAsync(kernel, plan, skContext, 10);
+            await Planner.ExecutePlanAsync(kernel, plan, skContext, 3);
+
         }
     }
 }

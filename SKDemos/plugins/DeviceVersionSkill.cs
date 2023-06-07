@@ -12,7 +12,7 @@ namespace SKDemos.plugins
 {
     public class DeviceVersionSkill
     {
-        [SKFunction("Find device version number from official Surface Web Page")]
+        [SKFunction("Find device version number from official Surface Web Page and provide a list of available versions")]
         [SKFunctionInput(Description = "First HTML table string input")]
         [SKFunctionContextParameter(Name = "devicename", Description = "Second device name")]
         public string GetAvailableVersions(string input, SKContext context)

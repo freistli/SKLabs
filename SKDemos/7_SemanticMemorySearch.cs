@@ -28,12 +28,20 @@ public static class SemanticMemory
     //when use ACS< this is the index name
     private const string MemoryCollectionName = "SKGithubSample";
 
-    public static async Task DemoACSDocIndexQueryAsync(IKernel kernel, string query)
+    public static string index = "docindex";
+
+    public static async Task DemoACSDocIndexQueryAsync(IKernel kernel, string index, string query)
     {
         Console.WriteLine("==============================================================");
         Console.WriteLine("======== Semantic Memory using Azure Cognitive Search ========");
         Console.WriteLine("==============================================================");
 
+        if (string.IsNullOrEmpty(index))
+        {
+            Console.WriteLine("Please provide an index name");
+            index = Console.ReadLine().Trim();
+        }
+        SemanticMemory.index = index;
         //The docindex has been built by other code, here we just query it
         await RunDocIndexAsync(kernel, query);  
 
@@ -102,7 +110,9 @@ public static class SemanticMemory
 
      public static async Task RunDocIndexAsync(IKernel kernel, string query)
     {
-        await SearchDocIndexMemoryAsync(kernel, "knowledge", query);
+        //await SearchDocIndexMemoryAsync(kernel, SemanticMemory.index, query);
+
+        await SearchDocIndexMemoryInConversationAsync(kernel, SemanticMemory.index, query);
      }
 
 
@@ -192,6 +202,7 @@ public static class SemanticMemory
                 var chatHistory = (OpenAIChatHistory)chatGPT.CreateNewChat("You are a librarian, expert about books");
 
                 var context = "";
+                var pages = "";
 
                 await foreach (MemoryQueryResult memory in memories)
                 {
@@ -200,12 +211,16 @@ public static class SemanticMemory
                     Console.WriteLine("  Content    : " + memory.Metadata.Text);
                     Console.WriteLine();
                     context += memory.Metadata.Text + "\r\n";
+                    pages += memory.Metadata.Description + "\r\n";
                 }        
 
                 chatHistory.AddUserMessage($"{context} ====================================r\n" 
                         + "Please answer the following question based on above information: \r\n"
                         + query);
-                        await MessageOutputAsync(chatHistory);
+                        Console.WriteLine("------------------------");
+                        Console.WriteLine("Pages: \r\n" + pages);
+                        Console.WriteLine("------------------------");
+                        Console.WriteLine(query);
         
                 string reply = await chatGPT.GenerateMessageAsync(chatHistory);
                 chatHistory.AddAssistantMessage(reply);

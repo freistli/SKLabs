@@ -10,25 +10,28 @@ settings.UseQDrant = false;
 IKernel kernel = settings.BuildSKernel();
 
 //await RawSummparyPrompt.DemoAsync(kernel);
-
 //await ChainRawPrompts.DemoAsync(kernel);
 //await CoreSkills.DemoTextSkillAsync(kernel);
 //await CoreSkills.DemoHttpSkillAsync(kernel);
 //await ChainCoreAndMySkills.DemoChainNativeFunctionAsync(kernel);
 //await ChainCoreAndMySkills.DemoChainSemanticFunctionAsync(kernel);
 //await ChainCoreAndMySkills.DemoSummarizeURL(kernel,"");
-//await Planner.DemoPlannerAsync(kernel);
 
-//6
+//5.
+await Planner.DemoPlannerAsync(kernel);
+
+//6.
 //require UseMemoryStore as true or UseQDrant as true
-
-//await SKConnectors.DemoConnectorsAsync(kernel);
+//await SKConnectors.DemoConnectorsAsync(kernel,"ChunkToQDrantAsync");
 
 //await WebSearchUrl.RunAsync();
 //await ConversationSummary.RunAsync(kernel);
 
-await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"");
+//7.
+//require UseACSMemoryStore as true
+//await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"","");
 
+//7
 //await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
 
 //Console.ReadKey();
