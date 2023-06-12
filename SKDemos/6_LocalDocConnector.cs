@@ -33,29 +33,30 @@ namespace SKDemos
             skContext.Set("input", "c:\\testtemp\\data\\info.docx");
             skContext.Set(TextMemorySkill.CollectionParam, "localworddoc");
             skContext.Set("question", "give me a summary of the content");            
-/*
+
+            //this needs to be done before the first run if you use memory
+            //start
+             
             var result = await kernel.RunAsync( skContext,
             skill["ReadTextAsync"],
-            chunkToMemorySkill[chunkFounctionName],
-            textMemorySkill["Recall"],
-            summarize
+            chunkToMemorySkill[chunkFounctionName]
             );
-
-            Console.WriteLine(result);
-*/
-            skContext.Set("input", "c:\\testtemp\\data\\info.docx");
-            skContext.Set("question", "what's the first program that the author wrote");
+             
+            //end
+            
+            //this is for memory recall
+            skContext.Set("input", "作者写的第一个程序是什么");
+            skContext.Set("question", "作者写的第一个程序是什么");
 
             prompt = @"Based on the information {{$input}}, answer this question: {{$question}}";
             var answer = kernel.CreateSemanticFunction(prompt);
 
-            var result = await kernel.RunAsync( skContext,
-            skill["ReadTextAsync"],
+            var result2 = await kernel.RunAsync( skContext,
             textMemorySkill["Recall"],
             answer
             );
 
-            Console.WriteLine(result);
+            Console.WriteLine(result2);
         }
     }
 }

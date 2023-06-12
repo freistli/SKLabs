@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 OpenAISettings settings = new OpenAISettings();
 settings.IsAzure = false;
-settings.UseACSMemoryStore = true;
-settings.UseMemoryStore = false;
-settings.UseQDrant = false;
+ 
+settings.MyMemoryStoreType = MemoryStoreType.Volatile;
+
 IKernel kernel = settings.BuildSKernel();
 
 //await RawSummparyPrompt.DemoAsync(kernel);
@@ -18,18 +18,22 @@ IKernel kernel = settings.BuildSKernel();
 //await ChainCoreAndMySkills.DemoSummarizeURL(kernel,"");
 
 //5.
-await Planner.DemoPlannerAsync(kernel);
+//await Planner.DemoPlannerAsync(kernel);
 
 //6.
 //require UseMemoryStore as true or UseQDrant as true
 //await SKConnectors.DemoConnectorsAsync(kernel,"ChunkToQDrantAsync");
+//await SKConnectors.DemoConnectorsAsync(kernel,"ChunkToMemoryAsync");
 
 //await WebSearchUrl.RunAsync();
 //await ConversationSummary.RunAsync(kernel);
 
 //7.
 //require UseACSMemoryStore as true
+//Console.InputEncoding = System.Text.Encoding.Unicode;
+//Console.OutputEncoding = System.Text.Encoding.Unicode;
 //await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"","");
+await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
 
 //7
 //await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
@@ -42,5 +46,7 @@ await Planner.DemoPlannerAsync(kernel);
 //await ChatGPT.RunAsync(kernel);
 
 //await FunctionSummary.RunAsync(kernel);
+
+//await SKTokens.DemoAsync();
 
 

@@ -7,6 +7,13 @@ using Microsoft.SemanticKernel.Reliability;
 
 namespace SKDemos
 {
+    public enum MemoryStoreType
+{
+    ACSExtend,
+    ACSDefault,
+    Volatile,
+    QDrant
+}
     public class OpenAISettings
     {
         public string OpenAIKey { get; set; }
@@ -18,12 +25,8 @@ namespace SKDemos
 
         public bool IsAzure { get; set;}
 
-        public bool UseACSMemoryStore { get; set;}
-
-        public bool UseMemoryStore { get; set;}
-
-        public bool UseQDrant { get; set;}
         public IConfigurationRoot Config { get; private set; }
+        public MemoryStoreType MyMemoryStoreType { get; set; }
 
         public bool IsValid()
         {
@@ -103,22 +106,25 @@ namespace SKDemos
 
            builder = Kernel.Builder.WithLogger(ConsoleLogger.Log);
 
-           if(UseACSMemoryStore)
-           {
-                ACSInit();
-                builder.WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY));
-           }
-
-           if(UseMemoryStore)
+           switch (MyMemoryStoreType)
             {
-                builder.WithMemoryStorage(new VolatileMemoryStore());
-            }
-
-            if (UseQDrant)
-            {
-                QdrantMemoryStore memoryStore = new("http://localhost", 6333, vectorSize: 1536, ConsoleLogger.Log);
-                builder.WithMemoryStorage(memoryStore);
-
+                case MemoryStoreType.ACSExtend:
+                    ACSInit();
+                    builder.WithMemory(new AzureCognitiveSearchMemoryExtend(ACS_API_ENDPOINT, ACS_API_KEY));
+                    break;
+                case MemoryStoreType.ACSDefault:
+                    ACSInit();
+                    builder.WithMemory(new AzureCognitiveSearchMemory(ACS_API_ENDPOINT, ACS_API_KEY));
+                    break;
+                case MemoryStoreType.Volatile:
+                    builder.WithMemoryStorage(new VolatileMemoryStore());
+                    break;
+                case MemoryStoreType.QDrant:
+                    QdrantMemoryStore memoryStore = new("http://localhost", 6333, vectorSize: 1536, ConsoleLogger.Log);
+                    builder.WithMemoryStorage(memoryStore);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid memory store type specified.");
             }
 
             if (IsValid())

@@ -62,6 +62,7 @@ public static class SemanticMemory
 
     }
 
+    ///Load web content, chunk, and embeded to memory
     public static async Task DemoEmbeddingyMemorySearchAsync(OpenAISettings settings)
     {
         var embeddingGenerator = new OpenAITextEmbeddingGeneration("text-embedding-ada-002", settings.OpenAIKey);
@@ -92,16 +93,16 @@ public static class SemanticMemory
         Console.WriteLine("\nAdding Web Content descriptions to the semantic memory.");
        var httpSkill = kernel.ImportSkill(new HttpSkill()); 
        var skContext = new ContextVariables();
-       skContext.Set("input", "https://raw.githubusercontent.com/microsoft/semantic-kernel/main/README.md");
+       skContext.Set("input", "https://lojones.github.io/2023/04/30/asimov-prompt-engineer.html");
 
        var output = await kernel.RunAsync(skContext, httpSkill["GetAsync"]);
 
-        await ChunkToMemory.RunAsync(kernel, output.Result, "rootbotReadMe");
+        await ChunkToMemory.RunAsync(kernel, output.Result, "promptengineer");
         kernel.ImportSkill(new TextMemorySkill(), nameof(TextMemorySkill));
         var memoryQuerySkill = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPlugins");
 
-        skContext.Set("input", "what's this file talking about?");
-        skContext.Set(TextMemorySkill.CollectionParam, "rootbotReadMe");
+        skContext.Set("input", "从文章里看，提示工程师能做哪些具体工作");
+        skContext.Set(TextMemorySkill.CollectionParam, "promptengineer");
         var result = await kernel.RunAsync(skContext, memoryQuerySkill["MemoryQuery"]);
 
         Console.WriteLine(result);
