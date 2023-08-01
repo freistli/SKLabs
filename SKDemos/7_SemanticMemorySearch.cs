@@ -93,7 +93,7 @@ public static class SemanticMemory
         Console.WriteLine("\nAdding Web Content descriptions to the semantic memory.");
        var httpSkill = kernel.ImportSkill(new HttpSkill()); 
        var skContext = new ContextVariables();
-       skContext.Set("input", "https://lojones.github.io/2023/04/30/asimov-prompt-engineer.html");
+       skContext.Set("input", "https://www.microsoft.com/en-us/worklab/work-trend-index/will-ai-fix-work");
 
        var output = await kernel.RunAsync(skContext, httpSkill["GetAsync"]);
 
@@ -101,7 +101,7 @@ public static class SemanticMemory
         kernel.ImportSkill(new TextMemorySkill(), nameof(TextMemorySkill));
         var memoryQuerySkill = kernel.ImportSemanticSkillFromDirectory("Plugins", "SemanticPlugins");
 
-        skContext.Set("input", "从文章里看，提示工程师能做哪些具体工作");
+        skContext.Set("input", "这篇文章主要谈论了什么");
         skContext.Set(TextMemorySkill.CollectionParam, "promptengineer");
         var result = await kernel.RunAsync(skContext, memoryQuerySkill["MemoryQuery"]);
 

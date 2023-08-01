@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 OpenAISettings settings = new OpenAISettings();
 settings.IsAzure = false;
  
-settings.MyMemoryStoreType = MemoryStoreType.Volatile;
+settings.MyMemoryStoreType = MemoryStoreType.ACSExtend;
 
 IKernel kernel = settings.BuildSKernel();
 
@@ -32,8 +32,8 @@ IKernel kernel = settings.BuildSKernel();
 //require UseACSMemoryStore as true
 //Console.InputEncoding = System.Text.Encoding.Unicode;
 //Console.OutputEncoding = System.Text.Encoding.Unicode;
-//await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"","");
-await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
+await SemanticMemory.DemoACSDocIndexQueryAsync(kernel,"","");
+//await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
 
 //7
 //await SemanticMemory.DemoEmbeddingyMemorySearchAsync(settings);
