@@ -44,7 +44,7 @@ namespace SKAzureFunctions
 
             if (IsValid())
             {
-                kernel.Config.AddAzureTextCompletionService(
+                Kernel.Builder.WithAzureTextCompletionService(
                     OpenAIDeploymentName,
                     OpenAIEndpoint,
                     OpenAIKey);

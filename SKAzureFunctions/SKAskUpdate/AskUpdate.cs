@@ -3,12 +3,12 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.CoreSkills;
 using Microsoft.SemanticKernel.Orchestration;
 using Newtonsoft.Json;
 using SKDemos.plugins;
 using System.Runtime.Caching;
 using System.Diagnostics;
+using Microsoft.SemanticKernel.Skills.Core;
 
 namespace SKAzureFunctions
 {
@@ -64,7 +64,7 @@ namespace SKAzureFunctions
             if (_cache.GetCacheItem(webdataUri) == null)
             {
                 _logger.LogInformation("cache miss for "+webdataUri);
-                var content = await _kernel.RunAsync(skContext, httpSkill["GetAsync"]);
+                var content = await _kernel.RunAsync(skContext, httpSkill["Get"]);
                 if(content?.Result != null)
                  _cache.Set(webdataUri, content.Result, _policy);                
             }
